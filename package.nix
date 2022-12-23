@@ -47,6 +47,8 @@
         "-w"
         "-X main.buildVersion=${version} -X main.buildCommit=${rev}"
       ];
+
+      doCheck = false;
     };
 in
   final

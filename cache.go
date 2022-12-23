@@ -72,12 +72,13 @@ func urlToIndexName(url *url.URL) (string, error) {
 }
 
 type cacheHandler struct {
-	log         *zap.Logger
-	handler     http.Handler
-	store       desync.WriteStore
-	index       desync.IndexWriteStore
-	trustedKeys map[string]ed25519.PublicKey
-	secretKeys  map[string]ed25519.PrivateKey
+	log             *zap.Logger
+	handler         http.Handler
+	store           desync.WriteStore
+	index           desync.IndexWriteStore
+	trustedKeys     map[string]ed25519.PublicKey
+	secretKeys      map[string]ed25519.PrivateKey
+	disallowUploads bool
 }
 
 func withCacheHandler(
@@ -86,6 +87,7 @@ func withCacheHandler(
 	index desync.IndexWriteStore,
 	trustedKeys map[string]ed25519.PublicKey,
 	secretKeys map[string]ed25519.PrivateKey,
+	disallowUploads bool,
 ) func(http.Handler) http.Handler {
 	if store == nil || index == nil {
 		return func(h http.Handler) http.Handler {
@@ -95,11 +97,12 @@ func withCacheHandler(
 
 	return func(h http.Handler) http.Handler {
 		return &cacheHandler{handler: h,
-			log:         log,
-			store:       store,
-			index:       index,
-			trustedKeys: trustedKeys,
-			secretKeys:  secretKeys,
+			log:             log,
+			store:           store,
+			index:           index,
+			trustedKeys:     trustedKeys,
+			secretKeys:      secretKeys,
+			disallowUploads: disallowUploads,
 		}
 	}
 }
@@ -111,7 +114,11 @@ func (c cacheHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	case "GET":
 		c.Get(w, r)
 	case "PUT":
-		c.Put(w, r)
+		if !c.disallowUploads {
+			c.Put(w, r)
+			return
+		}
+		fallthrough
 	default:
 		c.handler.ServeHTTP(w, r)
 	}

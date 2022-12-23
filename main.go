@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"strconv"
 	"syscall"
 	"time"
 
@@ -41,6 +42,8 @@ func main() {
 
 	arg.MustParse(proxy)
 	chunkSizeAvg = proxy.AverageChunkSize
+
+	proxy.disallowUploads, _ = strconv.ParseBool(proxy.DisallowUploads)
 
 	proxy.setupLogger()
 	proxy.setupDesync()
@@ -120,6 +123,7 @@ type Proxy struct {
 	GcInterval        time.Duration `arg:"--gc-interval,env:GC_INTERVAL" help:"Time between store garbage collection runs"`
 	LogLevel          string        `arg:"--log-level,env:LOG_LEVEL" help:"One of debug, info, warn, error, dpanic, panic, fatal"`
 	LogMode           string        `arg:"--log-mode,env:LOG_MODE" help:"development or production"`
+	DisallowUploads   string        `arg:"--disallow-uploads,env:DISALLOW_UPLOADS" help:"disallow all attempts to upload into the store"`
 
 	// derived from the above
 	secretKeys  map[string]ed25519.PrivateKey
@@ -134,6 +138,8 @@ type Proxy struct {
 	cacheChan chan string
 
 	log *zap.Logger
+
+	disallowUploads bool
 }
 
 func NewProxy() *Proxy {

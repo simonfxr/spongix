@@ -145,6 +145,14 @@ in {
           human readable.
         '';
       };
+
+      disallowUploads = lib.mkOption {
+        type = lib.types.bool;
+        default = false;
+        description = ''
+          Disallow uploads using http PUT.
+        '';
+      };
     };
   };
 
@@ -168,6 +176,7 @@ in {
         GC_INTERVAL = cfg.gcInterval;
         LOG_LEVEL = cfg.logLevel;
         LOG_MODE = cfg.logMode;
+        DISALLOW_UPLOADS = if cfg.disallowUploads then "1" else "0";
       };
 
       script = ''

@@ -61,6 +61,7 @@ func (proxy *Proxy) withLocalCacheHandler() mux.MiddlewareFunc {
 		proxy.localIndex,
 		proxy.trustedKeys,
 		proxy.secretKeys,
+		proxy.disallowUploads,
 	)
 }
 
@@ -71,6 +72,7 @@ func (proxy *Proxy) withS3CacheHandler() mux.MiddlewareFunc {
 		proxy.s3Index,
 		proxy.trustedKeys,
 		proxy.secretKeys,
+		proxy.disallowUploads,
 	)
 }
 
