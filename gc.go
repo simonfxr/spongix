@@ -14,7 +14,7 @@ import (
 	"time"
 
 	"github.com/folbricht/desync"
-	"github.com/numtide/go-nix/nar"
+	"github.com/nix-community/go-nix/pkg/nar"
 	"github.com/pascaldekloe/metrics"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
@@ -152,7 +152,10 @@ type integrityCheck struct {
 
 func checkNarContents(store desync.Store, idx desync.Index) error {
 	buf := newAssembler(store, idx)
-	narRd := nar.NewReader(buf)
+	narRd, err := nar.NewReader(buf)
+	if err != nil {
+		return err
+	}
 	none := true
 	for {
 		if _, err := narRd.Next(); err == nil {

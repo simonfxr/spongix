@@ -5,7 +5,7 @@
   inclusive,
   rev,
 }: let
-  final = package "sha256-NGQZqIawCOb1UPjFCSkSfPV02jMOD+MUx6b5LZyzy94=";
+  final = package "sha256-6KkZEzDO99IG2p9LeSzxaxrfk48rHmr6XUKkdwYe4Gs=";
   package = vendorSha256:
     buildGo118Module rec {
       pname = "spongix";
